@@ -1,0 +1,96 @@
+buildscript {
+
+    ext {
+        kotlinVersion = '1.3.10'
+        fasterXmlJacksonVersion = '2.9.3'
+        jsonrpc4jVersion = '1.5.2'
+        kotlinLoggingVersion = '1.5.3'
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath("gradle.plugin.org.jmailen.gradle:kotlinter-gradle:1.15.1")
+        classpath("gradle.plugin.org.ec4j.gradle:editorconfig-gradle-plugin:0.0.3")
+    }
+
+}
+
+allprojects {
+
+    group = 'com.wbtcb'
+    version = '0.0.1-SNAPSHOT'
+
+    apply plugin: 'kotlin'
+    apply plugin: 'kotlin-spring'
+    apply plugin: 'java-library'
+    apply plugin: 'org.jmailen.kotlinter'
+    apply plugin: 'org.ec4j.editorconfig'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            freeCompilerArgs = ["-Xjsr305=strict"]
+            jvmTarget = "1.8"
+        }
+    }
+
+    compileTestKotlin {
+        kotlinOptions {
+            freeCompilerArgs = ["-Xjsr305=strict"]
+            jvmTarget = "1.8"
+        }
+    }
+
+}
+
+subprojects {
+
+    dependencies {
+
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${fasterXmlJacksonVersion}"
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${fasterXmlJacksonVersion}"
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "${fasterXmlJacksonVersion}"
+
+        implementation group: 'org.web3j', name: 'core', version: "4.8.4"
+        implementation group: 'org.bitcoinj', name: 'bitcoinj-core', version: "0.14.7"
+        implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: "4.9.1"
+
+        implementation("io.github.microutils:kotlin-logging:${kotlinLoggingVersion}")
+    }
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from javadoc.destinationDir
+    }
+
+    artifacts {
+        archives sourcesJar
+        archives javadocJar
+    }
+}
+
+editorconfig {
+    excludes = ['out/**', 'build/**']
+}
+check.dependsOn editorconfigCheck

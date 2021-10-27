@@ -1,0 +1,3 @@
+rootProject.name = 'xnode-client'
+
+include ':eth-node-client'
